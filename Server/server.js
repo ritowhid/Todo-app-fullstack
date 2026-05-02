@@ -9,7 +9,7 @@ app.use(cors());
 const db = mysql.createConnection({
   host: "localhost",
   user: "root",
-  password: "*******",
+  password: "Admin@123",
   database: "todos_app",
 });
 
@@ -78,14 +78,20 @@ app.post("/delete-task", (req, res) => {
   });
 });
 
-app.post("/complete-task", (req, res) => {
+app.post("/toggle-task", (req, res) => {
+  const { id, status } = req.body;
+
   const q = "update todos set status = ? where id =?";
-  db.query(q, ["completed", req.body.id], (err, result) => {
-    if (result) {
-      db.query("select * from todos", (e, newList) => {
-        res.send(newList);
-      });
+  db.query(q, [status, id], (err, result) => {
+    if (err) {
+      console.log("Failed to update status", err);
+      return res.status(500).send(err);
     }
+
+    // no need to check result like before
+    db.query("select * from todos", (e, newList) => {
+      res.send(newList);
+    });
   });
 });
 

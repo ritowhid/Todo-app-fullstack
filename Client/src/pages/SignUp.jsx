@@ -1,6 +1,4 @@
 import React, { useState } from "react";
-import { createUserWithEmailAndPassword } from "firebase/auth";
-import { auth } from "../firebase";
 
 const SignUp = () => {
   // --- State Management ---
@@ -8,10 +6,9 @@ const SignUp = () => {
   const [password, setPassword] = useState("");
   const [username, setUsername] = useState(""); // Added for the username field
 
-  // --- Auth Handler ---
+  // --- Auth Handler (Firebase removed) ---
   const handleSignup = async () => {
     try {
-      await createUserWithEmailAndPassword(auth, email, password);
       alert("Signup success");
     } catch (err) {
       alert(err.message);
@@ -19,7 +16,7 @@ const SignUp = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-linear-to-br from-indigo-500">
+    <div className="min-h-screen flex flex-col items-center justify-center bg-linear-to-br from-blue-600">
 
       {/* Title */}
       <h2 className="text-white text-4xl font-semibold mb-6 drop-shadow-md">
@@ -74,7 +71,7 @@ const SignUp = () => {
           {/* Button */}
           <button 
             onClick={handleSignup}
-            className="w-full bg-linear-to-r from-indigo-600 to-purple-500 text-white font-bold py-3 rounded-lg uppercase tracking-wider hover:scale-[1.02] hover:opacity-90 transition"
+            className="w-full bg-blue-600 text-white font-bold py-3 rounded-lg uppercase tracking-wider hover:scale-[1.02] hover:opacity-90 transition"
           >
             Sign Up
           </button>
@@ -84,9 +81,9 @@ const SignUp = () => {
             Already have an account?
             <a
               href="SignIn.html"
-              className="ml-1 text-indigo-600 font-semibold hover:underline"
+              className="ml-1 text-blue-600 font-semibold hover:underline"
             >
-              Sign In
+              Log In
             </a>
           </p>
 

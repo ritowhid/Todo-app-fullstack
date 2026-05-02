@@ -60,8 +60,10 @@ const Home = () => {
             });
     };
 
-    const handleComplete = (id) => {
-        axios.post('http://localhost:5000/complete-task', { id })
+    const handleToggleStatus = (id, currentStatus) => {
+        const newStatus = currentStatus === 'completed' ? 'active' : 'completed';
+
+        axios.post('http://localhost:5000/toggle-task', { id, status: newStatus })
             .then(res => {
                 setTodos(res.data);
             });
@@ -71,7 +73,7 @@ const Home = () => {
     return (
         <div className='bg-gray-100 w-screen h-screen'>
             <div className='flex flex-col justify-start items-center h-full gap-1 pt-10'>
-                
+
                 <h2 className='font-bold text-2xl mb-4'>Do-it</h2>
 
                 {/* Input Section */}
@@ -100,7 +102,7 @@ const Home = () => {
 
                 {/* Task List Container */}
                 <div className='flex-1 overflow-y-auto w-full flex flex-col items-center' style={{ scrollbarWidth: 'none' }}>
-                    
+
                     {/* Tab 1: All Tasks */}
                     {tab === 1 && todos?.map(todo => (
                         <div key={todo.id} className='flex justify-between bg-white p-3 w-80 mt-3 rounded-md'>
@@ -109,10 +111,15 @@ const Home = () => {
                                 <p className='text-xs text-gray-600'>{new Date(todo.createdAt).toLocaleDateString()}</p>
                                 <p className='text-sm text-gray-700'>Status : {todo.status}</p>
                             </div>
-                            <div className='flex flex-col text-sm justify-start items-start'>
+                            <div className='flex flex-col text-sm w-17 items-start'>
                                 <button className='text-blue-600 cursor-pointer' onClick={() => handleEdit(todo.id, todo.task)}>Edit</button>
                                 <button className='text-red-600 cursor-pointer' onClick={() => handleDelete(todo.id)}>Delete</button>
-                                <button className='text-green-600 cursor-pointer' onClick={() => handleComplete(todo.id)}>Complete</button>
+                                <button
+                                    className='text-green-600 cursor-pointer'
+                                    onClick={() => handleToggleStatus(todo.id, todo.status)}
+                                >
+                                    {todo.status === 'completed' ? 'Incomplete' : 'Complete'}
+                                </button>
                             </div>
                         </div>
                     ))}
@@ -125,10 +132,15 @@ const Home = () => {
                                 <p className='text-xs text-gray-600'>{new Date(todo.createdAt).toLocaleDateString()}</p>
                                 <p className='text-sm text-gray-700'>Status : {todo.status}</p>
                             </div>
-                            <div className='flex flex-col text-sm justify-start items-start'>
+                            <div className='flex flex-col text-sm w-17 items-start'>
                                 <button className='text-blue-600 cursor-pointer' onClick={() => handleEdit(todo.id, todo.task)}>Edit</button>
                                 <button className='text-red-600 cursor-pointer' onClick={() => handleDelete(todo.id)}>Delete</button>
-                                <button className='text-green-600 cursor-pointer' onClick={() => handleComplete(todo.id)}>Complete</button>
+                                <button
+                                    className='text-green-600 cursor-pointer'
+                                    onClick={() => handleToggleStatus(todo.id, todo.status)}
+                                >
+                                    {todo.status === 'completed' ? 'Incomplete' : 'Complete'}
+                                </button>
                             </div>
                         </div>
                     ))}
