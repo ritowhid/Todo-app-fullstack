@@ -1,6 +1,6 @@
 # 📝 'Do-It' Todo App (Full Stack)
 
-A full-stack Todo application built with **React**, **Node.js**, **Express**, and **MySQL**, featuring JWT authentication and user-specific task management.
+A full-stack Todo application built with **React**, **Vite**, **Node.js**, **Express**, and **MySQL**, featuring JWT authentication and user-specific task management.
 
 ---
 
@@ -19,18 +19,22 @@ A full-stack Todo application built with **React**, **Node.js**, **Express**, an
 ## 🛠️ Tech Stack
 
 ### Frontend
-- React.js
-- Axios
-- React Router DOM
-- Tailwind CSS
+| Package | Purpose |
+|---|---|
+| React + Vite | UI framework & build tool |
+| React Router DOM | Client-side routing |
+| Axios | HTTP requests |
+| Tailwind CSS | Styling |
 
 ### Backend
-- Node.js
-- Express.js
-- MySQL (mysql2)
-- JWT (jsonwebtoken)
-- bcryptjs
-- dotenv
+| Package | Purpose |
+|---|---|
+| Node.js + Express | Server & REST API |
+| MySQL (mysql2) | Relational database |
+| jsonwebtoken | JWT auth |
+| bcryptjs | Password hashing |
+| cors | Cross-origin requests |
+| dotenv | Environment variables |
 
 ---
 
@@ -39,7 +43,7 @@ A full-stack Todo application built with **React**, **Node.js**, **Express**, an
 ```
 project-root/
 │
-├── client/                  (React frontend)
+├── client/                  (React + Vite frontend)
 │   ├── src/pages/Home.jsx
 │   ├── src/pages/Login.jsx
 │   ├── src/pages/SignUp.jsx
@@ -63,7 +67,39 @@ git clone <your-repo-url>
 cd project-root
 ```
 
-### 2️⃣ Backend Setup
+### 2️⃣ Database Setup
+
+Run the following SQL to initialize the database:
+
+```sql
+CREATE DATABASE IF NOT EXISTS todos_app;
+USE todos_app;
+
+CREATE TABLE users (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    username VARCHAR(100),
+    email VARCHAR(100) NOT NULL UNIQUE,
+    password VARCHAR(255) NOT NULL,
+    createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE todos (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    task VARCHAR(255) NOT NULL,
+    status ENUM('active', 'completed') DEFAULT 'active',
+    user_id INT NOT NULL,
+    createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    INDEX idx_user_id (user_id),
+    INDEX idx_status (status),
+    CONSTRAINT fk_user_todo
+        FOREIGN KEY (user_id)
+        REFERENCES users(id)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+```
+
+### 3️⃣ Backend Setup
 
 ```bash
 cd server
@@ -88,27 +124,53 @@ node server.js
 
 Server runs on: `http://localhost:5000`
 
-### 3️⃣ Frontend Setup
+### 4️⃣ Frontend Setup
 
 ```bash
 cd client
 npm install
-npm start
+npm run dev
 ```
 
-Frontend runs on: `http://localhost:3000`
+Frontend runs on: `http://localhost:5173`
+
+---
+
+## 🗄️ Database Architecture
+
+**Engine:** InnoDB | **Charset:** utf8mb4 (full Unicode + emoji support) | **Relationship:** One-to-Many (Users → Todos)
+
+### Table: `users`
+| Field | Type | Attributes | Description |
+|---|---|---|---|
+| id | INT(11) | PK, AI | Unique User ID |
+| username | VARCHAR(100) | utf8mb4 | Display name |
+| email | VARCHAR(100) | UNIQUE | Auth email |
+| password | VARCHAR(255) | — | Bcrypt hashed |
+| createdAt | TIMESTAMP | DEFAULT NOW | Created time |
+
+### Table: `todos`
+| Field | Type | Attributes | Description |
+|---|---|---|---|
+| id | INT(11) | PK, AI | Unique Task ID |
+| task | VARCHAR(255) | utf8mb4 | Task content |
+| status | ENUM | DEFAULT 'active' | active / completed |
+| user_id | INT(11) | FK → users.id | Owner reference |
+| createdAt | DATETIME | DEFAULT NOW | Created time |
+
+> **Cascading Deletes:** Deleting a user automatically removes all their todos (`ON DELETE CASCADE`), maintaining referential integrity.
 
 ---
 
 ## 🔐 Authentication Flow
 
-1. User signs up → JWT token generated
+1. User signs up → password hashed with bcrypt → JWT token generated
 2. Token stored in `localStorage`
-3. Token sent in `Authorization` header:
+3. Token sent in every request via `Authorization` header:
 ```
    Bearer <token>
 ```
-4. Backend middleware (`verifyToken`) protects routes
+4. Backend `verifyToken` middleware protects all task routes
 
 ---
 
@@ -116,13 +178,13 @@ Frontend runs on: `http://localhost:3000`
 
 ### Auth
 | Method | Endpoint | Description |
-|--------|----------|-------------|
+|---|---|---|
 | POST | `/signup` | Create user |
 | POST | `/login` | Login user |
 
 ### Todos (Protected)
 | Method | Endpoint | Description |
-|--------|----------|-------------|
+|---|---|---|
 | GET | `/read-tasks` | Get user tasks |
 | POST | `/new-task` | Create task |
 | POST | `/update-task` | Update task |
@@ -131,39 +193,27 @@ Frontend runs on: `http://localhost:3000`
 
 ---
 
-## 🧠 Key Improvements (Latest Fix)
-
-- Added input validation for login/signup
-- Prevented empty request crashes
-- Safer password comparison handling
-- Improved backend stability without changing logic flow
-
----
-
 ## 📷 UI Overview
 
-- **Login page** → First entry point
+- **Login page** → Entry point
 - **Signup page** → Create account
 - **Home page** → Task dashboard with tabs:
-  - All
-  - Active
-  - Completed
+  - All · Active · Completed
 
 ---
 
 ## ⚠️ Notes
 
-- Ensure MySQL server is running before starting backend
-- Ensure `.env` variables are correctly configured
-- Token is required for all task routes
+- Ensure MySQL is running before starting the backend
+- Ensure all `.env` variables are correctly set
+- Token is required for all `/todos` routes
+- Passwords are never stored in plain text
 
 ---
 
 ## 👨‍💻 Author
 
 Built by **Rakibul Towhid**
-
----
 
 ## 📌 License
 
